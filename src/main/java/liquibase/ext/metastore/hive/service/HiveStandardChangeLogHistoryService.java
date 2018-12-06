@@ -202,11 +202,6 @@ public class HiveStandardChangeLogHistoryService extends AbstractChangeLogHistor
         getDatabase().commit();
     }
 
-    public String concat(String field) {
-        String databaseChangeLogTableName = getDatabase().escapeObjectName(getDatabaseChangeLogTableName(), Table.class);
-        return databaseChangeLogTableName + "." + field;
-    }
-
     @Override
     public List<RanChangeSet> getRanChangeSets() throws DatabaseException {
         if (this.ranChangeSetList == null) {
@@ -217,13 +212,13 @@ public class HiveStandardChangeLogHistoryService extends AbstractChangeLogHistor
                 LOG.info("Reading from " + databaseChangeLogTableName);
                 List<Map<String, ?>> results = queryDatabaseChangeLogTable(database);
                 for (Map rs : results) {
-                    String fileName = rs.get(concat("FILENAME")).toString();
-                    String author = rs.get(concat("AUTHOR")).toString();
-                    String id = rs.get(concat("ID")).toString();
-                    String md5sum = rs.get(concat("MD5SUM")) == null || !databaseChecksumsCompatible ? null : rs.get(concat("MD5SUM")).toString();
-                    String description = rs.get(concat("DESCRIPTION")) == null ? null : rs.get(concat("DESCRIPTION")).toString();
-                    String comments = rs.get(concat("COMMENTS")) == null ? null : rs.get(concat("COMMENTS")).toString();
-                    Object tmpDateExecuted = rs.get(concat("DATEEXECUTED"));
+                    String fileName = rs.get("FILENAME").toString();
+                    String author = rs.get("AUTHOR").toString();
+                    String id = rs.get("ID").toString();
+                    String md5sum = rs.get("MD5SUM") == null || !databaseChecksumsCompatible ? null : rs.get("MD5SUM").toString();
+                    String description = rs.get("DESCRIPTION") == null ? null : rs.get("DESCRIPTION").toString();
+                    String comments = rs.get("COMMENTS") == null ? null : rs.get("COMMENTS").toString();
+                    Object tmpDateExecuted = rs.get("DATEEXECUTED");
                     Date dateExecuted = null;
                     if (tmpDateExecuted instanceof Date) {
                         dateExecuted = (Date) tmpDateExecuted;
@@ -234,13 +229,13 @@ public class HiveStandardChangeLogHistoryService extends AbstractChangeLogHistor
                         } catch (ParseException e) {
                         }
                     }
-                    String tmpOrderExecuted = rs.get(concat("ORDEREXECUTED")).toString();
+                    String tmpOrderExecuted = rs.get("ORDEREXECUTED").toString();
                     Integer orderExecuted = (tmpOrderExecuted == null ? null : Integer.valueOf(tmpOrderExecuted));
-                    String tag = rs.get(concat("TAG")) == null ? null : rs.get(concat("TAG")).toString();
-                    String execType = rs.get(concat("EXECTYPE")) == null ? null : rs.get(concat("EXECTYPE")).toString();
-                    ContextExpression contexts = new ContextExpression((String) rs.get(concat("CONTEXTS")));
-                    Labels labels = new Labels((String) rs.get(concat("LABELS")));
-                    String deploymentId = (String) rs.get(concat("DEPLOYMENT_ID"));
+                    String tag = rs.get("TAG") == null ? null : rs.get("TAG").toString();
+                    String execType = rs.get("EXECTYPE") == null ? null : rs.get("EXECTYPE").toString();
+                    ContextExpression contexts = new ContextExpression((String) rs.get("CONTEXTS"));
+                    Labels labels = new Labels((String) rs.get("LABELS"));
+                    String deploymentId = (String) rs.get("DEPLOYMENT_ID");
 
                     try {
                         RanChangeSet ranChangeSet = new RanChangeSet(fileName, id, author, CheckSum.parse(md5sum), dateExecuted, tag, ChangeSet.ExecType.valueOf(execType), description, comments, contexts, labels, deploymentId);
